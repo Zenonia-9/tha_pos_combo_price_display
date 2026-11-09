@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <!-- Shared widget used on POS order screen and receipt. -->
+    <t t-name="tha_pos_combo_price_display.Orderline"
+       t-inherit="point_of_sale.Orderline" t-inherit-mode="extension" owl="1">
+        <!-- Don't print a component's allocated amount. -->
+        <xpath expr="//div[hasclass('product-price')]" position="attributes">
+            <attribute name="t-if">!line.comboHiddenPrice</attribute>
+        </xpath>
+
+        <!-- Don't expose the component's allocated unit-price or discount. -->
+        <xpath expr="//li[hasclass('price-per-unit')]" position="attributes">
+            <attribute name="t-if">!line.comboHiddenPrice</attribute>
+        </xpath>
+        <xpath expr="//li[hasclass('price-per-unit')]" position="after">
+            <li t-if="line.comboHiddenPrice" class="combo-component-quantity">
+                <em t-esc="line.qty" class="qty fst-normal fw-bolder me-1"/>
+                <t t-if="line.unit" t-esc="line.unit"/>
+            </li>
+        </xpath>
+        <xpath expr="//li[contains(@t-if, 'line.discount')]" position="attributes">
+            <attribute name="t-if">!line.comboHiddenPrice and line.price !== 0 and line.discount and line.discount !== '0'</attribute>
+        </xpath>
+        <!-- Product attribute selections may show separate upgrade amounts. -->
+        <xpath expr="//t[@t-if='value.price_extra']" position="attributes">
+            <attribute name="t-if">value.price_extra and !line.comboHiddenPrice</attribute>
+        </xpath>
+        <!-- The combo parent has no actual unit-price. Avoid showing x 0. -->
+        <xpath expr="//li[hasclass('price-per-unit')]//t[@t-if='line.price !== 0']" position="attributes">
+            <attribute name="t-if">line.price !== 0 and !line.comboDisplayParent</attribute>
+        </xpath>
+    </t>
+</templates>
